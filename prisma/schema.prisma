@@ -27,8 +27,8 @@ model Account {
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String?  @db.Text
-    access_token      String?  @db.Text
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
     expires_at        Int?
     token_type        String?
     scope             String?
@@ -53,6 +53,7 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
+    topic         Topic[]
     accounts      Account[]
     sessions      Session[]
 }
@@ -63,4 +64,24 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Topic {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    title     String
+    user      User     @relation(fields: [userId], references: [id])
+    userId    String
+    notes     Note[]
+}
+
+model Note {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    title     String
+    content   String   @db.Text
+    topic     Topic    @relation(fields: [topicId], references: [id])
+    topicId   String
 }
