@@ -1,18 +1,40 @@
 import { useSession } from "next-auth/react";
 import { api, type RouterOutputs } from "~/utils/api";
 import { useState } from "react";
+import NoteEditor from "./NoteEditor";
+import NoteCard from "./NoteCard";
+
 
 type Topic = RouterOutputs['topic']['getAll'][0]
 
 const Content: React.FC = () => {
     const { data: sessionData } = useSession()
     const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
+
+    const {data: notes, refetch: refetchNotes} = api.note.getAll.useQuery({
+        topicId: selectedTopic?.id ?? ""
+    }, {
+        enabled: sessionData?.user !== undefined && selectedTopic !== null
+    })
+
+    const createNote = api.note.create.useMutation({
+        onSuccess: () => {
+            refetchNotes()
+        }
+    })
+
+    const deleteNote = api.note.delete.useMutation({
+        onSuccess: () => {
+            refetchNotes()
+        }
+    })
+
     const { data: topics, refetch: refetchTopics } = api.topic.getAll.useQuery(
         undefined,
         {
             enabled: sessionData?.user !== undefined,
             onSuccess: (data) => {
-                setSelectedTopic(selectedTopic! ?? data[0] ?? null)
+                setSelectedTopic(selectedTopic ?? data[0] ?? null)
             }
         }
     )
@@ -51,7 +73,24 @@ const Content: React.FC = () => {
                 }}
                 type="text" />
         </div>
-        <div className="cols-span-3"></div>
+        <div className="col-span-3">
+            <div>
+                {notes?.map((note)=> (
+                    <div className="mt-5">
+                        <NoteCard
+                        note={note}
+                        onDelete={()=> void deleteNote.mutate({id: note.id})}
+                        />
+                    </div>
+                ))}
+            </div>
+            <NoteEditor onSave={({title, content})=> 
+            void createNote.mutate({
+                title,
+                content,
+                topicId: selectedTopic?.id ?? ""
+            })}/>
+        </div>
     </div>
 }
 
