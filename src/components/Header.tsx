@@ -15,7 +15,7 @@ const Header = () => {
                     <label
                         tabIndex={0}
                         className='btn-ghost btn-circle avatar btn'
-                        onClick={() => signOut()}
+                        onClick={() => void signOut()}
                     >
                         <div className="w-10 rounded-full">
                             <Image
@@ -28,7 +28,7 @@ const Header = () => {
                 ) : (
                     <button
                         className='btn-ghost rounded-btn btn'
-                        onClick={() => signIn()}
+                        onClick={() => void signIn()}
                     >
                         Sign In
                     </button>
