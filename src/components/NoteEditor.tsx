@@ -2,7 +2,6 @@ import React, {useState} from 'react'
 import CodeMirror from "@uiw/react-codemirror"
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from "@codemirror/language-data"
-import { api } from '~/utils/api'
 
 const NoteEditor = ({
     onSave
